@@ -98,9 +98,9 @@ def handle_error(e):
 
 def get_suspicious_patterns():
     """Returns suspicious patterns for payloads and headers."""
-    patrones_payload = get_payload_patterns()
-    patrones_headers = get_headers_patterns()
-    return patrones_payload, patrones_headers
+    payload_patterns = get_payload_patterns()
+    header_patterns = get_headers_patterns()
+    return payload_patterns, header_patterns
 
 def get_current_timestamp():
     """Returns the current timestamp in ISO 8601 format."""

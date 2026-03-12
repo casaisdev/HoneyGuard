@@ -47,10 +47,10 @@ def get_logs_by_fingerprint():
         return jsonify({"error": "The 'fingerprint' parameter is required"}), 400
     try:
         logs = get_logs()
-        filtrados = [l for l in logs if l.get("fingerprint") == fingerprint]
+        filtered_logs = [l for l in logs if l.get("fingerprint") == fingerprint]
         if ip:
-            filtrados = [l for l in filtrados if l.get("ip") == ip]
-        return jsonify(filtrados)
+            filtered_logs = [l for l in filtered_logs if l.get("ip") == ip]
+        return jsonify(filtered_logs)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -66,9 +66,9 @@ def get_fingerprint_info(fingerprint):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@logs_bp.route("/logs/fingerprints_unicos", methods=["GET"])
+@logs_bp.route("/logs/unique_fingerprints", methods=["GET"])
 @require_jwt_auth()
-def get_fingerprints_unicos():
+def get_unique_fingerprints():
     """Returns all unique fingerprints and their statistics from Redis."""
     try:
         fingerprints = list_unique_fingerprints()

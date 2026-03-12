@@ -471,13 +471,13 @@ def simple_upload():
         uploads_dir = os.path.join(os.path.dirname(__file__), '..', 'uploads')
         os.makedirs(uploads_dir, exist_ok=True)
         
-        # Sanitizar el nombre de archivo para prevenir path traversal
+        # Sanitize the filename to prevent path traversal
         original_filename = file.filename
         sanitized_filename = sanitize_filename(original_filename)
         
-        # Detectar si hubo un intento de path traversal
+        # Detect if there was a path traversal attempt
         if sanitized_filename == "blocked_traversal_attempt":
-            # Log intento malicioso
+            # Log malicious attempt
             create_log(request, {
                 "attack_type": "path_traversal_upload",
                 "severity": "high",
@@ -496,7 +496,7 @@ def simple_upload():
         filename = f"{timestamp}_{sanitized_filename}"
         file_path = os.path.join(uploads_dir, filename)
         
-        # Verificación adicional: asegurar que el path final esté dentro de uploads_dir
+        # Additional verification: ensure final path stays within uploads_dir
         real_uploads_dir = os.path.realpath(uploads_dir)
         real_file_path = os.path.realpath(file_path)
         

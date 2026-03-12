@@ -9,7 +9,7 @@ from routes.fake_cves import fake_cves_bp
 from routes.fake_wp import fake_wp_bp
 from routes.fake_admin import fake_admin_bp
 from routes.auth import auth_bp
-# from routes.health import health_bp  # Comentado - módulo no existe
+# from routes.health import health_bp  # Commented out - module does not exist
 import time
 import logging
 from logging.handlers import RotatingFileHandler
@@ -90,7 +90,7 @@ def create_app():
     app.register_blueprint(fake_admin_bp)
     
     # Health check endpoints (no auth required for monitoring)
-    # app.register_blueprint(health_bp, url_prefix='/api')  # Comentado - módulo no existe
+    # app.register_blueprint(health_bp, url_prefix='/api')  # Commented out - module does not exist
     
     # Configurable auth route for security (honeypot)
     app.register_blueprint(auth_bp, url_prefix=f'/api/{Config.AUTH_ROUTE_PREFIX}')

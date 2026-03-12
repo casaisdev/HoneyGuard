@@ -66,12 +66,12 @@ def classify_attack(data, headers, path=None, original_attack_type=None, origina
     payload_matches = []
     header_matches = []
 
-    def match_category(mapeo, value, tipo, origen):
-        for regex, cat, subcat in mapeo:
+    def match_category(mapping, value, attack_type, source):
+        for regex, cat, subcat in mapping:
             if re.search(regex, value, re.IGNORECASE):
-                match = (tipo, cat, subcat, regex, origen)
+                match = (attack_type, cat, subcat, regex, source)
                 matches.append(match)
-                if origen == "payload":
+                if source == "payload":
                     payload_matches.append(match)
                 else:
                     header_matches.append(match)
@@ -135,18 +135,18 @@ def classify_attack(data, headers, path=None, original_attack_type=None, origina
         return original_attack_type, original_attack_type, "generic", matches
 
     # If there's no original type, use priority
-    prioridad = ["rce", "admin_panel_probe", "ftp", "ssh", "sql_injection", "xss", "lfi", "ssrf", "open_redirect", "payload"]
+    priority_order = ["rce", "admin_panel_probe", "ftp", "ssh", "sql_injection", "xss", "lfi", "ssrf", "open_redirect", "payload"]
     
     # 1. Prioritize payload matches
-    for tipo in prioridad:
+    for attack_type in priority_order:
         for m in payload_matches:
-            if m[0] == tipo:
+            if m[0] == attack_type:
                 return m[0], m[1], m[2], matches
     
     # 2. If none in payload, prioritize header matches
-    for tipo in prioridad:
+    for attack_type in priority_order:
         for m in header_matches:
-            if m[0] == tipo:
+            if m[0] == attack_type:
                 return m[0], m[1], m[2], matches
     
     # If no matches
@@ -162,7 +162,7 @@ def classify_attack(data, headers, path=None, original_attack_type=None, origina
         # Legitimate log access routes
         legitimate_log_routes = [
             "/logs", "/logs/analysis", "/logs/by_fingerprint",
-            "/logs/fingerprint_info", "/logs/fingerprints_unicos",
+            "/logs/fingerprint_info", "/logs/unique_fingerprints",
             "/logs/debug", "/logs/debug/stats", "/logs/debug/fingerprints"
         ]
         if path_lower in legitimate_log_routes:
@@ -324,7 +324,7 @@ def classify_attack(data, headers, path=None, original_attack_type=None, origina
             return "log_fingerprint_access", "admin_access", "fingerprint_logs", matches
         if ends(path_lower, "logs/fingerprint_info"):
             return "log_fingerprint_info", "admin_access", "fingerprint_info", matches
-        if ends(path_lower, "logs/fingerprints_unicos"):
+        if ends(path_lower, "logs/unique_fingerprints"):
             return "log_unique_fingerprints", "admin_access", "unique_fingerprints", matches
         if ends(path_lower, "logs/debug"):
             return "log_debug_access", "admin_access", "debug_logs", matches
@@ -393,38 +393,38 @@ def is_scanner(ip):
 # Suspicious pattern detection (same as before)
 def detect_patterns(data, headers, path=None):
     if path:
-        patrones_payload = get_patterns_by_context(path)
+        payload_patterns = get_patterns_by_context(path)
     else:
-        patrones_payload = get_payload_patterns()
+        payload_patterns = get_payload_patterns()
     
     # Add specific attack patterns for more complete detection
-    patrones_payload += get_sql_injection_patterns()
-    patrones_payload += get_xss_patterns()
-    patrones_payload += get_lfi_patterns()
-    patrones_payload += get_rce_patterns()
-    patrones_payload += get_ssrf_patterns()
-    patrones_payload += get_open_redirect_patterns()
-    patrones_payload += get_ftp_patterns() + get_ssh_patterns()
+    payload_patterns += get_sql_injection_patterns()
+    payload_patterns += get_xss_patterns()
+    payload_patterns += get_lfi_patterns()
+    payload_patterns += get_rce_patterns()
+    payload_patterns += get_ssrf_patterns()
+    payload_patterns += get_open_redirect_patterns()
+    payload_patterns += get_ftp_patterns() + get_ssh_patterns()
     
-    patrones_headers = get_headers_patterns()
-    patrones_headers += get_sql_injection_patterns()
-    patrones_headers += get_xss_patterns()
-    patrones_headers += get_lfi_patterns()
-    patrones_headers += get_rce_patterns()
-    patrones_headers += get_ssrf_patterns()
-    patrones_headers += get_open_redirect_patterns()
-    patrones_headers += get_ftp_patterns() + get_ssh_patterns()
+    header_patterns = get_headers_patterns()
+    header_patterns += get_sql_injection_patterns()
+    header_patterns += get_xss_patterns()
+    header_patterns += get_lfi_patterns()
+    header_patterns += get_rce_patterns()
+    header_patterns += get_ssrf_patterns()
+    header_patterns += get_open_redirect_patterns()
+    header_patterns += get_ftp_patterns() + get_ssh_patterns()
     
     found = []
     if data:
-        for patron in patrones_payload:
-            if re.search(patron, data, re.IGNORECASE):
-                found.append(f"payload:{patron}")
+        for pattern in payload_patterns:
+            if re.search(pattern, data, re.IGNORECASE):
+                found.append(f"payload:{pattern}")
     if headers:
         headers_str = str(headers)
-        for patron in patrones_headers:
-            if re.search(patron, headers_str, re.IGNORECASE):
-                found.append(f"header:{patron}")
+        for pattern in header_patterns:
+            if re.search(pattern, headers_str, re.IGNORECASE):
+                found.append(f"header:{pattern}")
     return found
 
 redis_client = get_redis_client()

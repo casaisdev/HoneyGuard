@@ -67,7 +67,7 @@ export const logsService = {
 
   // Get unique fingerprints
   getUniqueFingerprints: async () => {
-    const response = await api.get('/logs/fingerprints_unicos')
+    const response = await api.get('/logs/unique_fingerprints')
     return response.data
   },
 }

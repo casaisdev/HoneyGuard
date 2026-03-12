@@ -166,8 +166,8 @@ VITE_REAL_DASHBOARD_ROUTE=/your-real-dashboard-route
 ## 🎯 Usage
 
 ### Accessing the Honeypot
-1. **Frontend**: `https://honeyguard.casaislabs.com/`
-2. **Backend**: `http://api-honeyguard.casaislabs.com/` - Requests Logged
+1. **Frontend**: Use your deployed frontend URL
+2. **Backend**: Use your configured API URL (`VITE_API_URL`) - Requests Logged
 
 ### Monitoring Attacks
 1. Access the admin dashboard using your configured route

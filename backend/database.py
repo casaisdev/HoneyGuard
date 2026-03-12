@@ -238,28 +238,28 @@ def calculate_request_frequency(ip):
 
 def detect_patterns(log_entry):
     """Detects suspicious patterns in the log data."""
-    patrones_payload = get_payload_patterns()
-    patrones_payload.extend(get_ftp_patterns())
-    patrones_payload.extend(get_ssh_patterns())
+    payload_patterns = get_payload_patterns()
+    payload_patterns.extend(get_ftp_patterns())
+    payload_patterns.extend(get_ssh_patterns())
     
-    patrones_headers = get_headers_patterns()
-    patrones_headers.extend(get_ftp_patterns())
-    patrones_headers.extend(get_ssh_patterns())
+    header_patterns = get_headers_patterns()
+    header_patterns.extend(get_ftp_patterns())
+    header_patterns.extend(get_ssh_patterns())
     
     detected_patterns = []
     
     # Analyze payload
     if log_entry.get("data"):
-        for patron in patrones_payload:
-            if re.search(patron, log_entry["data"], re.IGNORECASE):
-                detected_patterns.append(f"payload:{patron}")
+        for pattern in payload_patterns:
+            if re.search(pattern, log_entry["data"], re.IGNORECASE):
+                detected_patterns.append(f"payload:{pattern}")
     
     # Analyze headers
     if log_entry.get("headers"):
         headers_str = str(log_entry["headers"])
-        for patron in patrones_headers:
-            if re.search(patron, headers_str, re.IGNORECASE):
-                detected_patterns.append(f"header:{patron}")
+        for pattern in header_patterns:
+            if re.search(pattern, headers_str, re.IGNORECASE):
+                detected_patterns.append(f"header:{pattern}")
     
     return detected_patterns
 
@@ -1188,7 +1188,7 @@ def analyze_logs():
         analysis["retry_persistence"] = retry
         # 8. Emerging tools/techniques
         cursor.execute("SELECT tool, MIN(timestamp) FROM logs WHERE tool IS NOT NULL GROUP BY tool")
-        emergentes = []
+        emerging_tools = []
         for row in cursor.fetchall():
             try:
                 tool, first_seen = row[0], row[1]
@@ -1201,11 +1201,11 @@ def analyze_logs():
                         first_seen_dt = datetime.fromisoformat(first_seen + '+00:00')
                     
                     if (now - first_seen_dt).days < 2:
-                        emergentes.append(tool)
+                        emerging_tools.append(tool)
             except Exception as e:
                 logger.warning(f"Error parsing timestamp for tool {tool}: {e}")
                 continue
-        analysis["emerging_tools_techniques"] = {"tools": emergentes}
+        analysis["emerging_tools_techniques"] = {"tools": emerging_tools}
         # 9. Multi-stage chains
         cursor.execute("SELECT fingerprint, path, timestamp FROM logs WHERE fingerprint IS NOT NULL ORDER BY fingerprint, timestamp")
         seq_logs = cursor.fetchall()

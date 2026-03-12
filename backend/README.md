@@ -251,7 +251,7 @@ Filter logs by attack fingerprint.
 #### GET `/logs/fingerprint_info/<fingerprint>`
 Get detailed information about a specific attack pattern.
 
-#### GET `/logs/fingerprints_unicos`
+#### GET `/logs/unique_fingerprints`
 Get list of unique attack fingerprints.
 
 #### GET `/uploads`

@@ -28,7 +28,7 @@ def is_legitimate_route(path):
         "/logs/analysis", 
         "/logs/by_fingerprint",
         "/logs/fingerprint_info",
-        "/logs/fingerprints_unicos",
+        "/logs/unique_fingerprints",
         "/logs/debug",
         "/logs/debug/stats",
         "/logs/debug/fingerprints"
@@ -68,7 +68,7 @@ def create_log(request, extra=None):
     timestamp = datetime.now(timezone.utc).isoformat()
     dns = get_dns(ip)
     freq = calculate_request_frequency(ip)
-    patrones = detect_patterns(data, headers, path=request.path)
+    detected_patterns = detect_patterns(data, headers, path=request.path)
     payload_hash = hashlib.sha256(data.encode()).hexdigest() if data else ""
     fingerprint_details = fingerprint_request(request)
     fingerprint_hash = generate_fingerprint(request)
@@ -127,8 +127,8 @@ def create_log(request, extra=None):
         "browser": browser,
         "dns": dns,
         "request_frequency": freq,
-        "patterns_detected": patrones,
-        "suspicious": (bool(patrones) or is_suspicious_route) and not is_legitimate_endpoint,
+        "patterns_detected": detected_patterns,
+        "suspicious": (bool(detected_patterns) or is_suspicious_route) and not is_legitimate_endpoint,
         "payload_hash": payload_hash,
         "fingerprint": fingerprint_hash,
         "fingerprint_details": fingerprint_details,
